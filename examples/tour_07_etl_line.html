@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>07 nodes — etl_line</title>
+<style>
+  body { font-family: system-ui, -apple-system, sans-serif; margin: 2rem; color: #0f172a; }
+  h1 { font-size: 1.25rem; font-weight: 600; margin: 0 0 1.25rem 0; color: #334155; }
+  pre.mermaid { display: flex; justify-content: center; background: #fff; margin: 0; }
+</style>
+</head>
+<body>
+<h1>07 nodes — etl_line</h1>
+<pre class="mermaid">
+flowchart TD
+    extract([&quot;extract&quot;]):::done
+    parse[&quot;parse&quot;]:::done
+    validate_row[&quot;validate_row&quot;]:::done
+    enrich[&quot;enrich&quot;]:::done
+    load[&quot;load&quot;]:::done
+    verify[&quot;verify&quot;]:::done
+    report[&quot;report&quot;]:::done
+    extract --&gt;|ok| parse
+    parse --&gt;|ok| validate_row
+    validate_row --&gt;|ok| enrich
+    enrich --&gt;|ok| load
+    load --&gt;|ok| verify
+    verify --&gt;|ok| report
+
+    classDef pending fill:#e2e8f0,stroke:#94a3b8,color:#475569
+    classDef active fill:#3b82f6,stroke:#1d4ed8,color:#fff,stroke-width:3px
+    classDef done fill:#22c55e,stroke:#16a34a,color:#fff
+    classDef error fill:#ef4444,stroke:#dc2626,color:#fff
+</pre>
+<script src="mermaid.min.js"></script>
+<script>mermaid.initialize({ startOnLoad: true });</script>
+</body>
+</html>

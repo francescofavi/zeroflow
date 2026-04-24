@@ -1,0 +1,47 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Build artifacts
+dist/
+build/
+.coverage
+htmlcov/
+
+# All hidden directories (starts with .)
+.*/
+
+# Keep .gitignore, .github, .internal_docs (internal maintainer docs — excluded from PyPI sdist via pyproject)
+!.gitignore
+!.github/
+!.internal_docs/
+
+# Hidden files to ignore
+.DS_Store
+.coverage
+.env
+
+# Other files
+*.swp
+*.swo
+*.log
+*.bak
+
+# Virtual environments (non-hidden)
+env/
+venv/
+/.scripts/
+/.venv/
+
+# Library: uv.lock is not committed (deterministic resolution is for apps)
+uv.lock
+
+# Hidden helper files
+.run.sh
+.setup.sh
+.setup.bat
+.check_quality.py
+
+# Generated example artifacts
+examples/*.jpg

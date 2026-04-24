@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>15 nodes — triple_diamond</title>
+<style>
+  body { font-family: system-ui, -apple-system, sans-serif; margin: 2rem; color: #0f172a; }
+  h1 { font-size: 1.25rem; font-weight: 600; margin: 0 0 1.25rem 0; color: #334155; }
+  pre.mermaid { display: flex; justify-content: center; background: #fff; margin: 0; }
+</style>
+</head>
+<body>
+<h1>15 nodes — triple_diamond</h1>
+<pre class="mermaid">
+flowchart TD
+    start([&quot;start&quot;]):::done
+    split[&quot;split&quot;]:::done
+    a_fetch[&quot;a_fetch&quot;]:::done
+    b_fetch[&quot;b_fetch&quot;]:::done
+    c_fetch[&quot;c_fetch&quot;]:::done
+    a_parse[&quot;a_parse&quot;]:::done
+    b_parse[&quot;b_parse&quot;]:::done
+    c_parse[&quot;c_parse&quot;]:::done
+    merge[&quot;merge&quot;]:::done
+    analyze[&quot;analyze&quot;]:::done
+    score[&quot;score&quot;]:::done
+    decide[&quot;decide&quot;]:::done
+    publish[&quot;publish&quot;]:::done
+    archive[&quot;archive&quot;]:::done
+    notify[&quot;notify&quot;]:::done
+    start --&gt;|ok| split
+    split --&gt;|go| a_fetch
+    split --&gt;|go| b_fetch
+    split --&gt;|go| c_fetch
+    a_fetch --&gt;|ok| a_parse
+    b_fetch --&gt;|ok| b_parse
+    c_fetch --&gt;|ok| c_parse
+    a_parse --&gt;|ok| merge
+    b_parse --&gt;|ok| merge
+    c_parse --&gt;|ok| merge
+    merge --&gt;|ok| analyze
+    analyze --&gt;|ok| score
+    score --&gt;|ok| decide
+    decide --&gt;|ok| publish
+    publish --&gt;|ok| archive
+    archive --&gt;|ok| notify
+
+    classDef pending fill:#e2e8f0,stroke:#94a3b8,color:#475569
+    classDef active fill:#3b82f6,stroke:#1d4ed8,color:#fff,stroke-width:3px
+    classDef done fill:#22c55e,stroke:#16a34a,color:#fff
+    classDef error fill:#ef4444,stroke:#dc2626,color:#fff
+</pre>
+<script src="mermaid.min.js"></script>
+<script>mermaid.initialize({ startOnLoad: true });</script>
+</body>
+</html>

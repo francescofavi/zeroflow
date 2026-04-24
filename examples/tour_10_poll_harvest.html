@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>10 nodes — poll_harvest</title>
+<style>
+  body { font-family: system-ui, -apple-system, sans-serif; margin: 2rem; color: #0f172a; }
+  h1 { font-size: 1.25rem; font-weight: 600; margin: 0 0 1.25rem 0; color: #334155; }
+  pre.mermaid { display: flex; justify-content: center; background: #fff; margin: 0; }
+</style>
+</head>
+<body>
+<h1>10 nodes — poll_harvest</h1>
+<pre class="mermaid">
+flowchart TD
+    init([&quot;init&quot;]):::done
+    connect[&quot;connect&quot;]:::done
+    poll[&quot;poll&quot;]:::done
+    download[&quot;download&quot;]:::done
+    unpack[&quot;unpack&quot;]:::done
+    parse[&quot;parse&quot;]:::done
+    validate[&quot;validate&quot;]:::done
+    enrich[&quot;enrich&quot;]:::done
+    persist[&quot;persist&quot;]:::done
+    summary[&quot;summary&quot;]:::done
+    init --&gt;|ok| connect
+    connect --&gt;|ok| poll
+    poll --&gt;|ready| download
+    poll -.-&gt;|again| poll
+    download --&gt;|ok| unpack
+    unpack --&gt;|ok| parse
+    parse --&gt;|ok| validate
+    validate --&gt;|ok| enrich
+    enrich --&gt;|ok| persist
+    persist --&gt;|ok| summary
+
+    classDef pending fill:#e2e8f0,stroke:#94a3b8,color:#475569
+    classDef active fill:#3b82f6,stroke:#1d4ed8,color:#fff,stroke-width:3px
+    classDef done fill:#22c55e,stroke:#16a34a,color:#fff
+    classDef error fill:#ef4444,stroke:#dc2626,color:#fff
+</pre>
+<script src="mermaid.min.js"></script>
+<script>mermaid.initialize({ startOnLoad: true });</script>
+</body>
+</html>

@@ -1,0 +1,171 @@
+[project]
+name = "zeroflow"
+dynamic = ["version"]
+description = "Zero-dependency workflow engine with HITL pause/resume, checkpointing, loopbacks and error routing."
+readme = "README.md"
+requires-python = ">=3.11"
+license = {text = "MIT"}
+authors = [{name = "Francesco Favi", email = "14098835+francescofavi@users.noreply.github.com"}]
+keywords = ["workflow", "orchestration", "pipeline", "checkpoint", "hitl", "zero-dependency"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Typing :: Typed",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/francescofavi/zeroflow"
+Repository = "https://github.com/francescofavi/zeroflow"
+Issues = "https://github.com/francescofavi/zeroflow/issues"
+Documentation = "https://github.com/francescofavi/zeroflow#readme"
+Changelog = "https://github.com/francescofavi/zeroflow/blob/main/CHANGELOG.md"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/zeroflow"]
+
+[tool.hatch.version]
+path = "src/zeroflow/__init__.py"
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+    "/.internal_docs/**",
+    "/.github/**",
+    "/.idea/**",
+    "/.venv/**",
+    "/.scripts/**",
+    "/dist/**",
+    "/build/**",
+    "/.pre-commit-config.yaml",
+    "/.python-version",
+    "/.coverage",
+    "/.check_quality.py",
+    "/.setup.bat",
+    "/.setup.sh",
+    "/.run.sh",
+    "/release-please-config.json",
+    "/.release-please-manifest.json",
+    "/uv.lock",
+    "/tests/**",
+]
+
+[tool.uv]
+managed = true
+
+[dependency-groups]
+dev = [
+    "pytest>=8.3.5",
+    "pytest-cov>=6.1.1",
+    "pytest-mock>=3.14.0",
+    "ruff>=0.11.8",
+    "mypy>=1.15.0",
+    "bandit>=1.7.10",
+    "vulture>=2.13",
+    "pre-commit>=4.2.0",
+]
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+exclude = [
+    ".venv",
+    ".git",
+    "__pycache__",
+    "*.egg-info",
+    ".pytest_cache",
+    ".mypy_cache",
+    ".ruff_cache",
+    "dist",
+    "build",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors - PEP 8 style violations
+    "F",  # pyflakes - unused imports, undefined names
+    "W",  # pycodestyle warnings - style warnings
+    "I",  # isort - import sorting
+    "N",  # pep8-naming - naming conventions
+    "UP",  # pyupgrade - use modern Python syntax
+    "B",  # flake8-bugbear - common bugs and design problems
+    "C4",  # flake8-comprehensions - list/dict comprehension improvements
+    "SIM",  # flake8-simplify - code simplification suggestions
+    "RUF",  # ruff-specific rules - dead noqa, modern syntax
+    "TRY",  # tryceratops - try/except hygiene
+    "FBT",  # flake8-boolean-trap - keyword-only booleans
+]
+
+ignore = [
+    "E501",  # line-too-long - line length violations (usually disabled)
+    "TRY003",  # contextual f-string messages preferred over per-message exception classes
+    "TRY004",  # validation API uses uniform ValueError for all definition errors (consistency contract)
+]
+
+[tool.mypy]
+python_version = "3.11"
+mypy_path = ["src"]
+files = ["src/zeroflow"]
+strict_optional = true
+warn_return_any = true
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = false
+warn_no_return = true
+warn_unreachable = true
+ignore_missing_imports = true
+check_untyped_defs = false
+namespace_packages = true
+explicit_package_bases = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+exclude = [
+    ".venv",
+    ".git",
+    "__pycache__",
+    ".*\\.egg-info",
+    ".pytest_cache",
+    ".mypy_cache",
+    ".ruff_cache",
+    "dist",
+    "build",
+]
+
+[tool.bandit]
+exclude_dirs = [
+    "tests",
+    ".venv",
+    ".git",
+    "__pycache__",
+    "*.egg-info",
+    ".pytest_cache",
+    ".mypy_cache",
+    ".ruff_cache",
+    "dist",
+    "build",
+]
+skips = ["B101","B403","B110"]
+
+[tool.vulture]
+paths = ["src"]
+min_confidence = 80
+ignore_decorators = ["@app.route", "@pytest.fixture"]
+ignore_names = ["setUp", "tearDown", "setUpClass", "tearDownClass"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-ra"
