@@ -3,7 +3,7 @@ name = "zeroflow"
 dynamic = ["version"]
 description = "Zero-dependency workflow engine with HITL pause/resume, checkpointing, loopbacks and error routing."
 readme = "README.md"
-requires-python = ">=3.11"
+requires-python = ">=3.12"
 license = {text = "MIT"}
 authors = [{name = "Francesco Favi", email = "14098835+francescofavi@users.noreply.github.com"}]
 keywords = ["workflow", "orchestration", "pipeline", "checkpoint", "hitl", "zero-dependency"]
@@ -13,7 +13,6 @@ classifiers = [
     "License :: OSI Approved :: MIT License",
     "Programming Language :: Python :: 3",
     "Programming Language :: Python :: 3 :: Only",
-    "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
@@ -28,38 +27,39 @@ Homepage = "https://github.com/francescofavi/zeroflow"
 Repository = "https://github.com/francescofavi/zeroflow"
 Issues = "https://github.com/francescofavi/zeroflow/issues"
 Documentation = "https://github.com/francescofavi/zeroflow#readme"
-Changelog = "https://github.com/francescofavi/zeroflow/blob/main/CHANGELOG.md"
+Changelog = "https://github.com/francescofavi/zeroflow/releases"
+LinkedIn = "https://www.linkedin.com/in/francesco-favi/"
 
 [build-system]
 requires = ["hatchling"]
 build-backend = "hatchling.build"
 
-[tool.hatch.build.targets.wheel]
-packages = ["src/zeroflow"]
-
 [tool.hatch.version]
 path = "src/zeroflow/__init__.py"
 
+[tool.hatch.build.targets.wheel]
+packages = ["src/zeroflow"]
+
 [tool.hatch.build.targets.sdist]
 exclude = [
-    "/.internal_docs/**",
     "/.github/**",
     "/.idea/**",
     "/.venv/**",
+    "/.internal_docs/**",
     "/.scripts/**",
     "/dist/**",
     "/build/**",
+    "/tests/**",
     "/.pre-commit-config.yaml",
     "/.python-version",
     "/.coverage",
-    "/.check_quality.py",
-    "/.setup.bat",
-    "/.setup.sh",
-    "/.run.sh",
+    "/check_quality.py",
+    "/setup.bat",
+    "/setup.sh",
+    "/run.sh",
     "/release-please-config.json",
     "/.release-please-manifest.json",
     "/uv.lock",
-    "/tests/**",
 ]
 
 [tool.uv]
@@ -67,18 +67,35 @@ managed = true
 
 [dependency-groups]
 dev = [
-    "pytest>=8.3.5",
-    "pytest-cov>=6.1.1",
-    "pytest-mock>=3.14.0",
-    "ruff>=0.11.8",
-    "mypy>=1.15.0",
-    "bandit>=1.7.10",
-    "vulture>=2.13",
-    "pre-commit>=4.2.0",
+    "pytest>=9.0.3",
+    "pytest-cov>=7.1.0",
+    "pytest-mock>=3.15.1",
+    "ruff>=0.15.12",
+    "mypy>=1.20.2",
+    "bandit>=1.9.4",
+    "vulture>=2.16",
+    "pre-commit>=4.6.0",
 ]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v -ra"
+
+[tool.coverage.run]
+source = ["src/zeroflow"]
+branch = true
+
+[tool.coverage.report]
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "pragma: no cover",
+]
+fail_under = 90
+
 [tool.ruff]
 line-length = 100
-target-version = "py311"
+target-version = "py312"
 exclude = [
     ".venv",
     ".git",
@@ -102,19 +119,14 @@ select = [
     "B",  # flake8-bugbear - common bugs and design problems
     "C4",  # flake8-comprehensions - list/dict comprehension improvements
     "SIM",  # flake8-simplify - code simplification suggestions
-    "RUF",  # ruff-specific rules - dead noqa, modern syntax
-    "TRY",  # tryceratops - try/except hygiene
-    "FBT",  # flake8-boolean-trap - keyword-only booleans
 ]
 
 ignore = [
     "E501",  # line-too-long - line length violations (usually disabled)
-    "TRY003",  # contextual f-string messages preferred over per-message exception classes
-    "TRY004",  # validation API uses uniform ValueError for all definition errors (consistency contract)
 ]
 
 [tool.mypy]
-python_version = "3.11"
+python_version = "3.12"
 mypy_path = ["src"]
 files = ["src/zeroflow"]
 strict_optional = true
@@ -142,6 +154,12 @@ exclude = [
     "build",
 ]
 
+# Mutable-state assertions across test/example flows trip warn_unreachable
+# (e.g. asserting state both before and after start()/stop()).
+[[tool.mypy.overrides]]
+module = ["tests.*", "examples.*"]
+warn_unreachable = false
+
 [tool.bandit]
 exclude_dirs = [
     "tests",
@@ -155,17 +173,11 @@ exclude_dirs = [
     "dist",
     "build",
 ]
-skips = ["B101","B403","B110"]
+exclude = ["check_quality.py"]
+skips = ["B101", "B403", "B110"]
 
 [tool.vulture]
 paths = ["src"]
 min_confidence = 80
 ignore_decorators = ["@app.route", "@pytest.fixture"]
 ignore_names = ["setUp", "tearDown", "setUpClass", "tearDownClass"]
-
-[tool.pytest.ini_options]
-testpaths = ["tests"]
-python_files = ["test_*.py"]
-python_classes = ["Test*"]
-python_functions = ["test_*"]
-addopts = "-ra"

@@ -15,13 +15,18 @@ jobs:
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
-          python-version: "3.11"
+          python-version: "3.12"
 
       - name: Install uv
         uses: astral-sh/setup-uv@v3
+        with:
+          enable-cache: false
 
       - name: Build package
         run: uv build
+
+      - name: Show dist contents
+        run: ls -lah dist/
 
       - name: Upload dist artifacts
         uses: actions/upload-artifact@v4
@@ -35,6 +40,7 @@ jobs:
     runs-on: ubuntu-latest
     environment: pypi
     permissions:
+      contents: read
       id-token: write
     steps:
       - name: Download dist artifacts
@@ -43,5 +49,10 @@ jobs:
           name: dist
           path: dist/
 
+      - name: Show dist contents
+        run: ls -lah dist/
+
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
+        with:
+          skip-existing: true
