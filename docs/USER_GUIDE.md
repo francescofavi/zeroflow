@@ -25,8 +25,7 @@ Excludes:
 - Internal module layout and runtime mechanics (see
   [`ARCHITECTURE.md`](ARCHITECTURE.md)).
 - Per-symbol API reference (see [`API_REFERENCE.md`](API_REFERENCE.md)).
-- Migration to the upcoming `zf/1` grammar (see
-  `WORKFLOW_GRAMMAR.md` at the repo root).
+- Migration to the upcoming `zf/1` grammar.
 - Deep per-component limit analysis, observed anti-patterns and an
   exhaustive comparison with alternative tools. Those are tracked
   internally and are not part of the public guide.
@@ -130,11 +129,10 @@ tracked internally and out of scope for this guide.
   edge is tagged `"is_loopback": true`.
 - *limit:* Resume rejected when the workflow SHA-256 hash has changed
   (`"workflow hash mismatch: ..."`).
-- *open:* Advanced grammar roadmap (`zf/1`) tracked in
-  `WORKFLOW_GRAMMAR.md` not yet implemented: `subflow`, per-node
-  `timeout_ms`, exponential backoff, `map`/fan-out, multiple entry
-  points, branch-local HITL, per-node `on_error`; retries engage only
-  on raised Python exceptions, not on `HandlerResult(error=...)`.
+- *open:* Advanced grammar (`zf/1`) not yet implemented: `subflow`,
+  per-node `timeout_ms`, exponential backoff, `map`/fan-out, multiple
+  entry points, branch-local HITL, per-node `on_error`; retries engage
+  only on raised Python exceptions, not on `HandlerResult(error=...)`.
 - *open:* No offline validator / JSON Schema shipped;
   `mermaid_to_html` writes browser-rendered HTML (using the vendored
   `mermaid.min.js` bundle) rather than a server-side raster image — a

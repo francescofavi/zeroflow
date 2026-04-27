@@ -179,11 +179,9 @@ the code, `open:` tracked roadmap item).
   edge is tagged `"is_loopback": true`.
 - *limit:* Resume rejected when the workflow SHA-256 hash has changed
   (`"workflow hash mismatch: ..."`).
-- *open:* Advanced grammar roadmap (`zf/1`) tracked in
-  [`WORKFLOW_GRAMMAR.md`](https://github.com/francescofavi/zeroflow/blob/main/WORKFLOW_GRAMMAR.md)
-  not yet implemented: `subflow`, per-node `timeout_ms`, exponential
-  backoff, `map`/fan-out, multiple entry points, branch-local HITL,
-  per-node `on_error`.
+- *open:* Advanced grammar (`zf/1`) not yet implemented: `subflow`,
+  per-node `timeout_ms`, exponential backoff, `map`/fan-out, multiple
+  entry points, branch-local HITL, per-node `on_error`.
 - *open:* No JSON Schema / offline validator CLI shipped yet;
   `mermaid_to_html` writes browser-rendered HTML that requires a
   modern browser to paint the diagram (no server-side raster image).
@@ -255,7 +253,6 @@ process are documented in
 ### Adjacent files
 
 - [`CHANGELOG.md`](https://github.com/francescofavi/zeroflow/blob/main/CHANGELOG.md) — release notes.
-- [`WORKFLOW_GRAMMAR.md`](https://github.com/francescofavi/zeroflow/blob/main/WORKFLOW_GRAMMAR.md) — roadmap for the next workflow grammar (`zf/1`).
 
 ## Contributing
 
