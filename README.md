@@ -256,12 +256,9 @@ process are documented in
 
 ## Contributing
 
-`zeroflow` is a personal portfolio project. Issues and small,
-well-scoped pull requests are welcome on
-[GitHub](https://github.com/francescofavi/zeroflow). Larger changes
-that expand scope beyond the "smallest coherent workflow engine"
-charter may not be merged — see the *Known limits and open issues*
-section above for what is intentionally out of scope.
+This repository is maintained as a personal portfolio project. Pull requests are generally not accepted, but exceptional contributions may be considered.
+
+For bug reports and feature requests, please use [GitHub Issues](https://github.com/francescofavi/zeroflow/issues).
 
 ## License
 
