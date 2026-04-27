@@ -1,0 +1,183 @@
+[project]
+name = "zeroflow"
+dynamic = ["version"]
+description = "Zero-dependency workflow engine with HITL pause/resume, checkpointing, loopbacks and error routing."
+readme = "README.md"
+requires-python = ">=3.12"
+license = {text = "MIT"}
+authors = [{name = "Francesco Favi", email = "14098835+francescofavi@users.noreply.github.com"}]
+keywords = ["workflow", "orchestration", "pipeline", "checkpoint", "hitl", "zero-dependency"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3 :: Only",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
+    "Typing :: Typed",
+    "Operating System :: OS Independent",
+    "Topic :: Software Development :: Libraries :: Python Modules",
+]
+dependencies = []
+
+[project.urls]
+Homepage = "https://github.com/francescofavi/zeroflow"
+Repository = "https://github.com/francescofavi/zeroflow"
+Issues = "https://github.com/francescofavi/zeroflow/issues"
+Documentation = "https://github.com/francescofavi/zeroflow#readme"
+Changelog = "https://github.com/francescofavi/zeroflow/releases"
+LinkedIn = "https://www.linkedin.com/in/francesco-favi/"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.version]
+path = "src/zeroflow/__init__.py"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/zeroflow"]
+
+[tool.hatch.build.targets.sdist]
+exclude = [
+    "/.github/**",
+    "/.idea/**",
+    "/.venv/**",
+    "/.internal_docs/**",
+    "/.scripts/**",
+    "/dist/**",
+    "/build/**",
+    "/tests/**",
+    "/.pre-commit-config.yaml",
+    "/.python-version",
+    "/.coverage",
+    "/check_quality.py",
+    "/setup.bat",
+    "/setup.sh",
+    "/run.sh",
+    "/release-please-config.json",
+    "/.release-please-manifest.json",
+    "/uv.lock",
+]
+
+[tool.uv]
+managed = true
+
+[dependency-groups]
+dev = [
+    "pytest>=9.0.3",
+    "pytest-cov>=7.1.0",
+    "pytest-mock>=3.15.1",
+    "ruff>=0.15.12",
+    "mypy>=1.20.2",
+    "bandit>=1.9.4",
+    "vulture>=2.16",
+    "pre-commit>=4.6.0",
+]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-v -ra"
+
+[tool.coverage.run]
+source = ["src/zeroflow"]
+branch = true
+
+[tool.coverage.report]
+exclude_also = [
+    "if TYPE_CHECKING:",
+    "raise NotImplementedError",
+    "pragma: no cover",
+]
+fail_under = 90
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+exclude = [
+    ".venv",
+    ".git",
+    "__pycache__",
+    "*.egg-info",
+    ".pytest_cache",
+    ".mypy_cache",
+    ".ruff_cache",
+    "dist",
+    "build",
+]
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors - PEP 8 style violations
+    "F",  # pyflakes - unused imports, undefined names
+    "W",  # pycodestyle warnings - style warnings
+    "I",  # isort - import sorting
+    "N",  # pep8-naming - naming conventions
+    "UP",  # pyupgrade - use modern Python syntax
+    "B",  # flake8-bugbear - common bugs and design problems
+    "C4",  # flake8-comprehensions - list/dict comprehension improvements
+    "SIM",  # flake8-simplify - code simplification suggestions
+]
+
+ignore = [
+    "E501",  # line-too-long - line length violations (usually disabled)
+]
+
+[tool.mypy]
+python_version = "3.12"
+mypy_path = ["src"]
+files = ["src/zeroflow"]
+strict_optional = true
+warn_return_any = true
+warn_unused_configs = true
+warn_redundant_casts = true
+warn_unused_ignores = false
+warn_no_return = true
+warn_unreachable = true
+ignore_missing_imports = true
+check_untyped_defs = false
+namespace_packages = true
+explicit_package_bases = true
+disallow_untyped_defs = false
+disallow_incomplete_defs = false
+exclude = [
+    ".venv",
+    ".git",
+    "__pycache__",
+    ".*\\.egg-info",
+    ".pytest_cache",
+    ".mypy_cache",
+    ".ruff_cache",
+    "dist",
+    "build",
+]
+
+# Mutable-state assertions across test/example flows trip warn_unreachable
+# (e.g. asserting state both before and after start()/stop()).
+[[tool.mypy.overrides]]
+module = ["tests.*", "examples.*"]
+warn_unreachable = false
+
+[tool.bandit]
+exclude_dirs = [
+    "tests",
+    ".venv",
+    ".git",
+    "__pycache__",
+    "*.egg-info",
+    ".pytest_cache",
+    ".mypy_cache",
+    ".ruff_cache",
+    "dist",
+    "build",
+]
+exclude = ["check_quality.py"]
+skips = ["B101", "B403", "B110"]
+
+[tool.vulture]
+paths = ["src"]
+min_confidence = 80
+ignore_decorators = ["@app.route", "@pytest.fixture"]
+ignore_names = ["setUp", "tearDown", "setUpClass", "tearDownClass"]
