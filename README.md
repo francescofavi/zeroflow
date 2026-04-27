@@ -15,7 +15,7 @@ JSON-serialisable `dict`, register one handler per node, call
 OR/AND joins, retry policy, HITL (human-in-the-loop) pause/resume,
 checkpointing to disk, error routing and a full event stream.
 
-**Pure stdlib, zero runtime dependencies. Python 3.11 → 3.14.**
+**Pure stdlib, zero runtime dependencies. Python 3.12 → 3.14.**
 
 ---
 
@@ -86,7 +86,7 @@ pip install zeroflow
 uv add zeroflow
 ```
 
-Supports **Python 3.11, 3.12, 3.13, 3.14**. No runtime dependencies.
+Supports **Python 3.12, 3.13, 3.14**. No runtime dependencies.
 
 ## Quick start
 
