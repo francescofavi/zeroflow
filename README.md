@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="https://raw.githubusercontent.com/francescofavi/zeroflow/main/logo.png" alt="zeroflow logo" width="200">
+</p>
+
 # zeroflow
 
 [![CI](https://img.shields.io/github/actions/workflow/status/francescofavi/zeroflow/ci.yml?branch=main&label=CI&cacheSeconds=0)](https://github.com/francescofavi/zeroflow/actions/workflows/ci.yml)
