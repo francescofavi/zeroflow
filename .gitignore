@@ -1,0 +1,49 @@
+# Python artifacts
+__pycache__/
+*.py[cod]
+*.egg-info/
+
+# Build artifacts
+dist/
+build/
+.coverage
+htmlcov/
+
+# All hidden directories (starts with .)
+.*/
+
+# Symlinks to out-of-tree dev caches/venvs (not always matched by .*/)
+.mypy_cache
+.venv
+
+# Keep tracked dotfiles/dotdirs (maintainer-only — excluded from PyPI sdist via pyproject)
+!.gitignore
+!.github/
+!.python-version
+!.pre-commit-config.yaml
+!.release-please-manifest.json
+
+# Hidden files to ignore (genuinely local, never committed)
+.DS_Store
+.env
+.codex
+
+# Other files
+*.swp
+*.swo
+*.log
+*.bak
+
+# Virtual environments (non-hidden)
+env/
+venv/
+
+# Library: uv.lock not committed (deterministic resolution is for apps, not libs)
+uv.lock
+
+# Local dev files
+demo_gradio.py
+
+# Generated example artifacts
+examples/*.jpg
+examples/tour_*.html
