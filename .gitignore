@@ -46,3 +46,4 @@ demo_gradio.py
 
 # Generated example artifacts
 examples/*.jpg
+examples/tour_*.html
