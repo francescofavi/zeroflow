@@ -22,7 +22,7 @@ For library *usage* see `USER_GUIDE.md`. For the public API see
 
 ## 1. Prerequisites
 
-- **Python**: 3.11, 3.12, 3.13, or 3.14.
+- **Python**: 3.12, 3.13, or 3.14.
 - **uv**: recommended package manager (`pipx install uv` or
   [official installer](https://docs.astral.sh/uv/getting-started/installation/)).
 - **git**: for cloning and committing.

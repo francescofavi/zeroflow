@@ -79,7 +79,7 @@ the rest of the stack is overkill.
   `time`, `typing`, `uuid`) are used in the runtime package. Nothing
   to audit, nothing to version-pin, nothing to keep updating.
 - **Embeddable.** The package is pure Python, `py.typed` shipped,
-  works anywhere Python 3.11–3.14 runs. No background daemons, no
+  works anywhere Python 3.12–3.14 runs. No background daemons, no
   sidecar processes, no required network.
 - **Deterministic serial execution.** Single-threaded FIFO scheduler:
   given the same workflow, same handlers and same input, the trace is
@@ -250,7 +250,7 @@ pip install zeroflow
 uv add zeroflow
 ```
 
-Python 3.11 or newer required. No runtime dependencies.
+Python 3.12 or newer required. No runtime dependencies.
 
 ### A minimum workflow
 
