@@ -9,74 +9,119 @@
 [![Dependencies](https://img.shields.io/badge/dependencies-none-brightgreen.svg?cacheSeconds=0)]()
 [![Code style: ruff](https://img.shields.io/badge/code%20style-ruff-000000.svg?cacheSeconds=0)](https://docs.astral.sh/ruff/)
 
-Agnostic **workflow engine** for Python. Describe the graph as a plain
-JSON-serialisable `dict`, register one handler per node, call
-`engine.run()`. The engine handles conditional routing, loopbacks,
-OR/AND joins, retry policy, HITL (human-in-the-loop) pause/resume,
-checkpointing to disk, error routing and a full event stream.
+**Workflow engine that fits in one import: graph routing, retries, OR/AND joins, HITL pause-resume, checkpointing, error routing. Pure stdlib, zero runtime dependencies.**
 
-**Pure stdlib, zero runtime dependencies. Python 3.12 → 3.14.**
+`zeroflow` runs JSON-described graphs in-process. You declare the workflow as a
+plain `dict`, register one Python handler per node, and call `engine.run()`.
+It handles plain DAGs as a sub-case, and also covers what DAGs cannot express
+on their own: explicit loopbacks, retries, OR/AND joins, and human-in-the-loop
+pause/resume — without standing up a scheduler, a database, or a worker pool.
+
+**What you get out of the box**
+
+- **Graph routing** — conditional branches, loopbacks, OR and AND joins. Forward-acyclic by construction; cycles are allowed only on edges explicitly tagged as loopbacks.
+- **Retry policy per node** — fixed-delay retries on raised exceptions.
+- **HITL pause/resume** — handlers can freeze the run and return a resumable checkpoint.
+- **Checkpointing to disk** — every completed node is a valid resume point, with a SHA-256 hash lock against incompatible workflow revisions.
+- **Error routing and full event stream** — including custom events emitted from handlers.
+- **Typed, JSON-serialisable, deterministic** — single-threaded FIFO scheduler, `py.typed` shipped.
+
+**How it works**
+
+A workflow is a JSON-serialisable `dict`. Each node points to a handler — a
+plain Python function that returns a `HandlerResult`. The engine walks the
+graph serially, persists checkpoints through a pluggable `WorkflowStore`, and
+returns a `WorkflowResult`. No broker, no scheduler, no web UI.
+
+**When you should use it**
+
+- Running a DAG in-process when you do not want Airflow / Prefect / Dagster infrastructure.
+- Embedding workflow logic inside agents, CLIs, jobs, AWS Lambda, or notebooks.
+- LLM agent loops shaped like *plan → execute → critique → retry* (where a plain DAG is not enough — you need loopbacks and retries).
+- Order/approval flows, data pipelines, or migration runners that need retries and resume without an orchestrator.
+- Cases where you want to start in-process now and wrap the engine inside a heavier orchestrator later, instead of replacing it.
+
+Supports **Python 3.12, 3.13, 3.14**.
 
 ---
 
-## Problem
+## Why the existing tools don't fit
 
-Small and medium workflows come up constantly: an LLM agent loop
-("plan → execute → critique → retry"), an order/approval flow, a data
-pipeline, a migration runner. People build them as ad-hoc state
-machines, bolting on retries, conditional branching, pause-and-resume,
-recovery on error, progress tracking. Doing one or two of those by
-hand is fine. Doing all of them consistently is where home-grown code
-gets fragile.
+There is already an orchestrator for everything, and each one comes with a
+cost that makes it the wrong shape for a workflow that has to live inside
+another process.
 
-The mainstream alternatives all impose a cost. Heavy orchestrators
-(Airflow, Prefect, Dagster, Temporal) want a scheduler, a database, a
-worker pool, a web UI. Task queues (Celery, RQ) solve "send work to a
-worker", not "execute this graph". LLM-graph engines (LangGraph) bake
-LLM semantics into the engine — wrong shape when most steps are not
-LLMs.
+- **Heavy orchestrators** — Airflow, Prefect, Dagster, Temporal. They bring
+  real workflow semantics, but each requires its own scheduler, database,
+  worker pool, and web UI. The right answer for scheduled production DAGs at
+  scale; the wrong answer for embedding a small graph inside a CLI, an agent,
+  or a Lambda.
+- **Task queues** — Celery, RQ. They solve "send work to a worker": dispatch
+  an independent task to a broker-backed pool. They do not walk a graph with
+  conditional branches, retries on the same node, OR/AND joins, or
+  pause/resume across processes.
+- **LLM-graph engines** — LangGraph and similar. They bake LLM semantics into
+  the engine itself. Useful when the workflow IS an LLM agent; the wrong
+  abstraction when most nodes are not LLMs.
+- **Hand-rolled state machines.** Fine when you need one or two of retries,
+  conditional branching, pause-and-resume, error recovery, or progress
+  tracking. Once you need all of them consistently, home-grown code gets
+  fragile.
 
-## Solution
+`zeroflow` sits below all of these. It is the in-process engine layer with no
+infrastructure attached: graph routing, retries, joins, HITL, checkpointing,
+error routing — and nothing else. When you outgrow in-process execution, you
+wrap `zeroflow` inside one of the heavier tools instead of replacing it.
 
-`zeroflow` is the **engine layer** extracted: a workflow is a JSON
-dict, a handler is a Python function, `engine.run()` returns a
-`WorkflowResult`. Nothing else — no scheduler, no broker, no database,
-no web UI. When you outgrow in-process execution, you wrap zeroflow
-inside a real orchestrator instead of replacing it.
+## Capabilities in detail
 
-## What it gives you
+The intro lists what you get; this section pins each capability to the
+concrete API surface and the operational guarantee behind it.
 
-- **Zero runtime dependencies.** Only standard library modules. Nothing to
-  audit, nothing to update weekly.
-- **Embeddable.** Drops into agents, CLIs, jobs, Lambdas, notebooks —
-  no infrastructure.
-- **Deterministic, serial.** Single-threaded FIFO scheduler; no hidden
-  concurrency, no race conditions to reason about.
-- **Checkpoint after every completed node.** Any `EVENT_CHECKPOINT`
-  payload, and any snapshot persisted to the store, is a valid resume
-  point.
-- **First-class HITL.** A handler returning
-  `HandlerResult(waiting=True, waiting_prompt=...)` freezes the run
-  and returns a resumable checkpoint. A new process can load it and
-  call `run_from_checkpoint(...)`.
-- **OR + AND joins built in.** `or` (default) and `and` (with a
-  `wait_for` barrier) on the same target.
-- **Workflow hash lock.** The workflow definition is SHA-256 hashed;
-  checkpoints are rejected on mismatch, so you cannot resume against
-  an incompatible revision of the graph.
-- **Retry policy per node** — `max_retries` + `retry_sleep_seconds`,
-  engages on raised exceptions only.
-- **Error routing** through `default_error_node` and
-  `state.workflow["__error__"]`.
-- **Custom events** from handlers (`ctx.emit(kind, data)`).
-- **Pluggable store** via `WorkflowStore` Protocol; in-memory and
-  JSON-on-disk reference implementations ship.
-- **Static validation at construction** — shape, references,
-  forward-acyclicity, JSON serialisability.
-- **Optional Mermaid visualisation** with fully offline HTML
-  rendering using a vendored `mermaid.min.js` bundle.
+- **Resumable HITL.** A handler that returns
+  `HandlerResult(waiting=True, waiting_prompt=...)` freezes the run mid-graph
+  and emits a resumable checkpoint. A new process can load that checkpoint
+  through the store and call `run_from_checkpoint(...)` — runs survive process
+  restarts, machine reboots, and week-long human approvals.
+- **Checkpoint after every completed node.** Each successful node completion
+  emits an `EVENT_CHECKPOINT` payload on the event stream and writes a
+  snapshot through the configured store. Either form is a valid resume point.
+- **OR + AND joins.** `or` (default) and `and` (with a `wait_for` barrier
+  listing the predecessor nodes) on the same target node. Multiple incoming
+  branches fan back into a single continuation point without bespoke gating
+  code in handlers.
+- **Retry policy per node.** `run_policy.max_retries` paired with
+  `run_policy.retry_sleep_seconds`. Engages on raised Python exceptions only —
+  explicit `HandlerResult(error=...)` returns are routed through
+  `default_error_node` instead.
+- **Error routing.** Unhandled exceptions and explicit `error` results land
+  on `default_error_node`, with the failing payload available at
+  `state.workflow["__error__"]`. The error-handling node owns retry-vs-abort
+  policy, so handlers stay free of try/except scaffolding.
+- **Workflow hash lock.** The workflow definition is SHA-256 hashed at
+  construction. Resuming a checkpoint against a different graph fails fast
+  with `workflow hash mismatch: ...` rather than silently routing through
+  stale wiring.
+- **Custom events from handlers.** `ctx.emit(kind, data)` lets a handler add
+  domain-specific events to the trace. The full event stream — system events
+  plus custom emissions — is captured in `WorkflowResult.trace`.
+- **Pluggable store.** Persistence is exposed as a `WorkflowStore` Protocol.
+  An in-memory implementation and a JSON-on-disk implementation ship in the
+  box; you can implement the protocol with any backend without touching
+  engine internals.
+- **Deterministic, serial execution.** Single-threaded FIFO scheduler. No
+  hidden concurrency, no race conditions to reason about — the same workflow
+  with the same input produces the same trace.
+- **Static validation at construction.** Shape, references,
+  forward-acyclicity, and JSON serialisability are all enforced before the
+  first node runs. Bad workflows fail at `WorkflowEngine(...)`, not three
+  hours into a long run.
+- **Optional Mermaid visualisation.** `mermaid_to_html(...)` writes a
+  self-contained HTML diagram of the graph. Fully offline — uses a vendored
+  `mermaid.min.js` bundle, no CDN at runtime.
 - **Typed public surface.** `py.typed` shipped, modern generics,
-  `from __future__ import annotations` everywhere.
+  `from __future__ import annotations` everywhere. The IDE understands
+  handler signatures and `WorkflowResult` shape.
 
 ## Installation
 
